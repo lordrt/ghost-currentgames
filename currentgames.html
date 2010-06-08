@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+	<title>List of Current GhostGraz Games</title>
+	<link rel="stylesheet" type="text/css" href="js/currentgames.css" />
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script> 
+	<script type="text/javascript" src="js/jquery.tablesorter.js"></script> 
+	<script type="text/javascript" src="js/jquery.ba-dotimeout.min.js"></script> 
+	<script type="text/javascript" src="js/ZeroClipboard.js"></script> 
+	<script type="text/javascript" src="js/base64.js"></script>	
+	<script type="text/javascript" src="js/currentgames.js"></script>	
+</head>
+<body>
+<div id="canvas">
+	<h1>List of current GHostGraz Games</h1>
+
+	<p>
+		The table bellow lists the current games available on ghostgraz servers.
+		Click a game name to copy it to the clipboard, alt-tab to Warcraft III,
+		open the Custom Games window, and paste away to join.<br/><br/>
+
+		Please report any bugs to via <a href="http://forum.ghostgraz.com/pm/sa,send/">
+		a private message</a> to lordrt on the GhostGraz forum.
+	</p>
+
+
+	<div class="currentgames" id="currentgames_0">
+		<table id="currentgames" class="tablesorter">
+			<thead>
+				<tr>
+					<th>bot &nbsp;&nbsp;&nbsp;&nbsp;</th>
+					<th>mode &nbsp;&nbsp;&nbsp;&nbsp;</th>
+					<th>game name &bull; click to copy &nbsp;&nbsp;&nbsp;&nbsp;</th>
+					<th>need &nbsp;&nbsp;&nbsp;&nbsp;</th>
+				</tr>		
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	
+		<p>
+			<a href="currentgames_noflash.html">No-Flash Version</a>. 
+			<a href="#" onclick="$(this).parent().parent().children('.dashboard').toggle();">Show/Hide dashboard</a>. 
+			<a href="#">About</a>
+		</p>
+
+		<div class="dashboard">
+		<p>	
+			<button id="update">Update</button> (autoupdates every 5 secs)<br/>
+		</p>
+		<p>
+			<button id="reload">Reload completely</button> <button id="clear">Clear</button>
+		</p>
+	</div>
+
+	<script type="text/javascript"> 
+		var selector = "table#currentgames"; // css selector for the html table with the games
+		var datasource = "currentgames.php"; // change to /feeds/currentgames.txt
+		var datasource2 = "currentgames.txt";
+
+		var use_flash = true;
+		$(document).ready(function() {
+			// init
+ 			ZeroClipboard.setMoviePath( 'js/ZeroClipboard10.swf' );
+			$(selector).tablesorter({
+				headers: { 0: { sorter:'number_on_the_end' }, 3: { sorter:'number_on_the_end'} } 
+			});
+			$.get(datasource, function(html) { update(datasource, selector, html); });
+			$.get(datasource2, function(html) { update(datasource2, selector, html); });
+
+			// update button (no need for it, really)
+			$("#update").click(function() {
+				$.get(datasource, function(html) { update(selector, html); }); 
+			});
+			$("#reload").click(function() {
+				remove_clipboards();
+				$(selector).clear();
+//				$.get(datasource, function(html) { update(selector, html); }); 
+			});
+			$("#clear").click(function() {
+				remove_clipboards();
+				$(selector + " tbody").html('');
+			});
+
+			// autoupdate every few seconds
+			// thx http://benalman.com/projects/jquery-dotimeout-plugin/
+			$.doTimeout( 5000, function() {
+				$.get(datasource, function(html) { update(datasource, selector, html); }); 
+				$.get(datasource2, function(html) { update(datasource2, selector, html); }); 
+				return true;
+			});
+
+			// every 5 minutes, refresh the whole table
+			// this is too weed out stale entries
+			$.doTimeout( 5000 * 60, function() {
+//				console.debug("Refreshing table ..");
+				remove_clipboards();
+				$.get(datasource, function(html) { updae(datasource, selector, html); }); 
+				$(selector).trigger("update"); // let tablesorter know
+				$(selector).trigger("sorton",[sorting]); 
+				return true;
+			});
+		});
+	</script>
+
+</div>
+</body>
+</html>          
+    
